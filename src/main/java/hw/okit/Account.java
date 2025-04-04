@@ -42,26 +42,32 @@ public class Account {
     return new LocalOperationResponse(LocalOperationResponse.INCORRECT_RESPONSE, response);
     
   }
-  public LocalOperationResponse withdraw(double amount){
+  public LocalOperationResponse withdraw(double amount) {
     if(activeSession == null)
       return LocalOperationResponse.NOT_LOGGED_RESPONSE;
     ServerResponse response = serverConnection.withdraw(activeSession, amount);
     switch(response.code){
       case ServerResponse.NOT_LOGGED:
         return LocalOperationResponse.NOT_LOGGED_RESPONSE;
+      case ServerResponse.UNDEFINED_ERROR:
+        return new LocalOperationResponse(LocalOperationResponse.UNDEFINED_ERROR, response.data);
+      case ServerResponse.INCORRECT_SESSION:
+        return new LocalOperationResponse(LocalOperationResponse.INCORRECT_SESSION, response.data);
+
       case ServerResponse.NO_MONEY:
         Object r = response.data;
-        if(r!=null && r instanceof Double)
-          return new LocalOperationResponse(LocalOperationResponse.NO_MONEY, (Double)r);
+        if(r != null && r instanceof Double)
+          return new LocalOperationResponse(LocalOperationResponse.NO_MONEY, (Double) r);
         break;
       case ServerResponse.SUCCESS:
         r = response.data;
-        if(r!=null && r instanceof Double)
-          return new LocalOperationResponse(LocalOperationResponse.SUCCEED, (Double)r);
+        if(r != null && r instanceof Double)
+          return new LocalOperationResponse(LocalOperationResponse.SUCCEED, (Double) r);
         break;
     }
     return new LocalOperationResponse(LocalOperationResponse.INCORRECT_RESPONSE, response);
-  }  
+  }
+
   public LocalOperationResponse deposit(double amount){
     if(activeSession == null)
       return LocalOperationResponse.NOT_LOGGED_RESPONSE;
